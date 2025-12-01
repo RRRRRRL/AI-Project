@@ -1,0 +1,12 @@
+seed: 42
+model_name: distilbert-base-uncased
+batch_size: 16
+epochs: 3
+lr: 2.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.06
+max_length: 256
+grad_clip_norm: 1.0
+eval_steps: 500
+output_dir: outputs/run1
+patience: 3
