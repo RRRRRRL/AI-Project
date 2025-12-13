@@ -7,14 +7,19 @@ val_split: 0.15
 test_split: 0.15
 model:
   input_size: 8          # [vx, vy, vz, speed, cos_track, sin_track, sin_tod, cos_tod]
-  hidden_size: 128
-  num_layers: 2
-  dropout: 0.2
+  hidden_size: 256       # Increased from 128 for better capacity
+  num_layers: 3          # Increased from 2 for deeper model
+  dropout: 0.3           # Increased from 0.2 for better regularization
+  use_layer_norm: true   # Added for training stability (use --use_layer_norm flag)
 optim:
   lr: 0.001
-  weight_decay: 0.0
-  batch_size: 128
-  epochs: 20
+  weight_decay: 0.00001  # Added regularization (1e-5)
+  batch_size: 256        # Increased from 128 for better gradient estimates
+  epochs: 50             # Increased from 20 for better convergence
   grad_clip: 1.0
+  warmup_epochs: 5       # Added warmup for stable training
+  patience: 10           # Increased from 5 for better convergence
+  min_improvement: 0.01  # Minimum ADE improvement for early stopping
+normalize: true          # Feature normalization (use --normalize flag)
 seed: 42
 output_dir: outputs/run1
