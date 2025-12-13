@@ -7,8 +7,8 @@ preprocesses it, and integrates it with the existing pipeline.
 
 The script:
 1. Loads historical data from OpenSky parquet files
-2. Parses columns: icao24, latitude, longitude, altitude, velocity, heading, time_position
-3. Preprocesses data (drops missing values, converts timestamps, normalizes)
+2. Parses columns: icao24, latitude, longitude, altitude, time_position
+3. Preprocesses data (drops missing values, converts timestamps, filters invalid values)
 4. Saves processed data as CSV in data/processed/ directory
 
 Output CSV format compatible with prepare_sequences.py:
@@ -171,8 +171,8 @@ def parse_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
     if df_processed['timestamp'].dtype == 'object' or 'datetime' in str(df_processed['timestamp'].dtype):
         df_processed['timestamp'] = pd.to_datetime(df_processed['timestamp']).astype(int) // 10**9
     else:
-        # For numeric types, ensure proper conversion to int
-        df_processed['timestamp'] = pd.to_numeric(df_processed['timestamp'], errors='coerce').astype(int)
+        # For numeric types, round to nearest second (preserves sub-second precision better than truncation)
+        df_processed['timestamp'] = pd.to_numeric(df_processed['timestamp'], errors='coerce').round().astype(int)
     
     # Ensure flight_id is string
     df_processed['flight_id'] = df_processed['flight_id'].astype(str)
@@ -194,7 +194,7 @@ def parse_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
     df_processed = df_processed[
         (df_processed['lat'] >= -90) & (df_processed['lat'] <= 90) &
         (df_processed['lon'] >= -180) & (df_processed['lon'] <= 180) &
-        (df_processed['alt'] > 0)  # Filter out sea-level and below-ground readings
+        (df_processed['alt'] >= -500)  # Filter obviously invalid readings (allow low-altitude/sea-level flights)
     ]
     logger.info(f"Filtered out {before_filter - len(df_processed)} rows with invalid values")
     
