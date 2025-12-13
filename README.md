@@ -1,67 +1,42 @@
-# LSTM Trajectory Forecasting for Hong Kong Airspace (Colab-first)
+# AI-Project
 
-This project forecasts aircraft trajectories around Hong Kong (VHHH) using a deep LSTM model. It predicts the next K steps of position offsets (east, north, up in meters) from the last H observed steps. It starts with a synthetic dataset for instant Colab training and can be swapped with real OpenSky data later.
+## Project Overview
+This repository implements an AI pipeline encompassing data preprocessing, model training, and evaluation for flight data analysis. Each stage of the pipeline is well-documented below.
 
-Why this scope
-- Meets deep learning requirement (multi-layer LSTM with nonlinearities).
-- Clear evaluation with ADE/FDE and visualization.
-- Hong Kong focus via region filtering and origin set near VHHH.
+---
 
-Quickstart (Google Colab)
-1) Install dependencies
-```
-!pip install -q torch==2.* numpy pandas matplotlib seaborn tqdm scikit-learn pyproj pymap3d pyyaml
-```
+## Workflow
 
-2) Create folders
-```
-!mkdir -p data/raw data/processed outputs configs src notebooks
-```
+1. **Data Preprocessing**
+    - `opensky_to_model_csv.py`: A script to extract raw data from OpenSky Network and convert it into a CSV suitable for modeling.
+      - **Usage**: `python opensky_to_model_csv.py --input opensky_raw.json --output model_data.csv`
+      - **Inputs**: OpenSky Network JSON files.
+      - **Outputs**: A CSV summarizing flight data ready for processing.
+    - `prepare_sequences_weather.py`: This tool combines weather data with flight sequences using the previously processed model_data.csv.
+      - **Usage**: `python prepare_sequences_weather.py --flights model_data.csv --weather weather_data.json --output sequences_weather.csv`
+      - **Inputs**: - Flights (`model_data.csv`) and Weather data (`weather_data.json`).
+      - **Outputs**: Enriched CSV ready for training.
 
-3) Save the files in `src/`, `configs/`, and `notebooks/` from this repo (clone or copy in Colab).
+2. **Model Training**
+    - Leverage the prepared sequences to train predictive models. Specify model configurations in `train_model.py`.
+      - **Usage Example**: `python train_model.py --config config.yaml`
 
-4) Generate a synthetic dataset (immediate training) OR bring your real OpenSky CSV
-```
-!python src/simulate_data.py --num_flights 600 --min_len 160 --max_len 260 --out_csv data/raw/hkg_synth.csv
-```
+3. **Model Evaluation**
+    - Evaluate trained models using test datasets and assess their performance against benchmarks.
+      - Use scripts like `evaluate_model.py` for these tasks.
+      - **Example**: `python evaluate_model.py --model best_model.pth --test_data test_data.csv`
 
-5) Prepare sequences
-```
-!python src/prepare_sequences.py --input_csv data/raw/hkg_synth.csv --output_npz data/processed/hkg_seq.npz --input_len 40 --pred_len 20 --resample_sec 30 --region "113.5,115.5,21.5,23.0"
-```
+---
 
-6) Train
-```
-!python src/train.py --data_npz data/processed/hkg_seq.npz --epochs 20 --batch_size 128 --hidden 128 --layers 2 --lr 1e-3 --dropout 0.2 --output_dir outputs/run1
-```
+## Getting Started
 
-7) Evaluate and visualize
-```
-!python src/evaluate.py --data_npz data/processed/hkg_seq.npz --model_dir outputs/run1/best --output_dir outputs/run1
+### Prerequisites
+Ensure you have the correct versions of required dependencies outlined in `requirements.txt`.
+
+```bash
+pip install -r requirements.txt
 ```
 
-Files
-- src/simulate_data.py — synthetic flight generator centered near VHHH
-- src/prepare_sequences.py — preprocessing, ENU conversion, windowing
-- src/dataset.py — PyTorch dataset for (X history, Y future offsets)
-- src/model.py — multi-layer LSTM with multi-horizon head
-- src/train.py — training loop with early stopping on validation ADE
-- src/evaluate.py — ADE/FDE metrics, CV baseline, plots
-- src/geo.py — ENU/lat-lon utility wrappers
-- configs/hkg_small.yaml — example config
-- notebooks/colab_setup.md — copy-paste cells for Colab
+---
 
-Real OpenSky data (optional later)
-- Export CSV with columns at least: flight_id (or icao24 + a per-flight segment id), timestamp (unix seconds), lat, lon, alt (meters).
-- Filter to HK region: lon ∈ [113.5, 115.5], lat ∈ [21.5, 23.0], and alt > 0.
-- Use the same `prepare_sequences.py` command with your CSV path.
-
-Metrics
-- ADE (average displacement error, meters)
-- FDE (final displacement error, meters)
-- Plots: loss curves, sample trajectory overlays, error histograms
-
-Extensions (after base done)
-- Add wind features (u/v) from a small GFS/ERA5 sample.
-- Retrieval augmentation: prepend stats from k similar past segments.
-- Small planning demo: greedy rollouts or A* on a synthetic cost map.
+For further contributions or details, refer to the [Issues](https://github.com/RRRRRRL/AI-Project/issues) tab to report bugs, discuss improvements, and track enhancements.
