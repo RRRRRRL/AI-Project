@@ -33,7 +33,8 @@ def main():
     ap.add_argument("--model_dir", type=str, required=True)
     ap.add_argument("--batch_size", type=int, default=256)
     ap.add_argument("--output_dir", type=str, default="outputs/run1")
-    ap.add_argument("--normalize", action="store_true", default=True)
+    ap.add_argument("--normalize", action="store_true", default=False,
+                    help="Enable feature normalization (should match training)")
     args = ap.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)

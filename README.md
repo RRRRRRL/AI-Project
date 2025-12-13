@@ -32,12 +32,12 @@ Quickstart (Google Colab)
 
 6) Train
 ```
-!python src/train.py --data_npz data/processed/hkg_seq.npz --epochs 50 --batch_size 256 --hidden 256 --layers 3 --lr 1e-3 --dropout 0.3 --weight_decay 1e-5 --patience 10 --warmup_epochs 5 --output_dir outputs/run1
+!python src/train.py --data_npz data/processed/hkg_seq.npz --epochs 50 --batch_size 256 --hidden 256 --layers 3 --lr 1e-3 --dropout 0.3 --weight_decay 1e-5 --patience 10 --warmup_epochs 5 --normalize --use_layer_norm --output_dir outputs/run1
 ```
 
 7) Evaluate and visualize
 ```
-!python src/evaluate.py --data_npz data/processed/hkg_seq.npz --model_dir outputs/run1/best --output_dir outputs/run1
+!python src/evaluate.py --data_npz data/processed/hkg_seq.npz --model_dir outputs/run1/best --output_dir outputs/run1 --normalize
 ```
 
 Files

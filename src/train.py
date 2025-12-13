@@ -34,8 +34,12 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--patience", type=int, default=10)
     ap.add_argument("--warmup_epochs", type=int, default=5)
-    ap.add_argument("--normalize", action="store_true", default=True)
-    ap.add_argument("--use_layer_norm", action="store_true", default=True)
+    ap.add_argument("--normalize", action="store_true", default=False, 
+                    help="Enable feature normalization (recommended)")
+    ap.add_argument("--use_layer_norm", action="store_true", default=False,
+                    help="Enable layer normalization in model (recommended)")
+    ap.add_argument("--min_improvement", type=float, default=0.01,
+                    help="Minimum improvement in validation ADE for early stopping")
     args = ap.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
@@ -133,7 +137,7 @@ def main():
               f"val_ADE={val_ade:.2f}m val_FDE={val_fde:.2f}m lr={current_lr:.6f}")
 
         # Early stopping with improved tolerance
-        if val_ade < best_val_ade - 0.01:  # Smaller threshold for better convergence
+        if val_ade < best_val_ade - args.min_improvement:
             best_val_ade = val_ade
             patience_counter = 0
             save_dir = os.path.join(args.output_dir, "best")
