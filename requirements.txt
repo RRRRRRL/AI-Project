@@ -10,3 +10,5 @@ pymap3d
 pyyaml
 requests
 pyarrow
+datasets
+huggingface_hub
