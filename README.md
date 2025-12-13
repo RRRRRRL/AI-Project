@@ -2,6 +2,31 @@
 
 This project forecasts aircraft trajectories around Hong Kong (VHHH) using a deep LSTM model. It predicts the next K steps of position offsets (east, north, up in meters) from the last H observed steps. It starts with a synthetic dataset for instant Colab training and can be swapped with real OpenSky data later.
 
+## 🎯 Quick Start: Pre-Built Deliverables
+
+**NEW**: Complete, self-contained deliverables are now available for immediate use:
+
+1. **📓 Jupyter Notebook**: [`LSTM_Trajectory_Prediction_Pipeline.ipynb`](LSTM_Trajectory_Prediction_Pipeline.ipynb)
+   - Full pipeline from data generation to evaluation
+   - Run directly in Google Colab or local Jupyter
+   - No external files needed - completely self-contained
+
+2. **📄 Technical Report**: [`LSTM_Trajectory_Prediction_Report.md`](LSTM_Trajectory_Prediction_Report.md)
+   - 3.5-page comprehensive report
+   - Ready for PDF conversion
+   - Includes all methodology and results
+
+3. **🎥 Video Script**: [`Video_Presentation_Script.md`](Video_Presentation_Script.md)
+   - 3-minute presentation script
+   - Complete with narration and visual guidance
+   - 8 slides, perfectly timed
+
+📚 **See [`DELIVERABLES_README.md`](DELIVERABLES_README.md) for detailed usage instructions.**
+
+---
+
+## Original Project Structure
+
 Why this scope
 - Meets deep learning requirement (multi-layer LSTM with nonlinearities).
 - Clear evaluation with ADE/FDE and visualization.
