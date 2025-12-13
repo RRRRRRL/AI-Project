@@ -42,6 +42,20 @@ def main():
     region = (lon_min, lon_max, lat_min, lat_max)
 
     df = pd.read_csv(args.input_csv)
+    
+    # Support both old column names (lat, lon, alt) and new names (latitude, longitude, altitude)
+    # Map each column individually for robustness
+    column_mapping = {}
+    if "latitude" in df.columns and "lat" not in df.columns:
+        column_mapping["latitude"] = "lat"
+    if "longitude" in df.columns and "lon" not in df.columns:
+        column_mapping["longitude"] = "lon"
+    if "altitude" in df.columns and "alt" not in df.columns:
+        column_mapping["altitude"] = "alt"
+    
+    if column_mapping:
+        df = df.rename(columns=column_mapping)
+    
     assert {"flight_id", "timestamp", "lat", "lon", "alt"}.issubset(df.columns)
 
     # Filter region and positive altitude
