@@ -84,8 +84,8 @@ def validate_report():
     print(f"✅ Word count: {word_count}")
     print(f"✅ Estimated pages: {estimated_pages:.1f} (target: 3-6 pages)")
     
-    if 1500 <= word_count <= 3500:
-        print("✅ Word count appropriate for 3-6 page report")
+    if 1500 <= word_count <= 3000:
+        print("✅ Word count appropriate for 3-6 page report (~500 words/page)")
     else:
         print(f"⚠️  Word count outside typical range")
     
