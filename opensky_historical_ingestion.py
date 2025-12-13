@@ -62,7 +62,8 @@ def load_parquet_file(file_path: str) -> Optional[pd.DataFrame]:
     if not os.path.exists(file_path):
         logger.error(f"File not found: {file_path}")
         logger.info("Please download OpenSky historical data from: https://opensky-network.org/datasets/states/")
-        logger.info("Expected OpenSky data format: Parquet files with columns like icao24, lat, lon, altitude, etc.")
+        logger.info("Expected format: OpenSky State Vectors (parquet files)")
+        logger.info("Required columns: icao24, lat/latitude, lon/longitude, altitude/geoaltitude/baroaltitude, time/timestamp")
         return None
     
     try:
@@ -170,7 +171,8 @@ def parse_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
     if df_processed['timestamp'].dtype == 'object' or 'datetime' in str(df_processed['timestamp'].dtype):
         df_processed['timestamp'] = pd.to_datetime(df_processed['timestamp']).astype(int) // 10**9
     else:
-        df_processed['timestamp'] = df_processed['timestamp'].astype(int)
+        # For numeric types, ensure proper conversion to int
+        df_processed['timestamp'] = pd.to_numeric(df_processed['timestamp'], errors='coerce').astype(int)
     
     # Ensure flight_id is string
     df_processed['flight_id'] = df_processed['flight_id'].astype(str)
@@ -192,7 +194,7 @@ def parse_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
     df_processed = df_processed[
         (df_processed['lat'] >= -90) & (df_processed['lat'] <= 90) &
         (df_processed['lon'] >= -180) & (df_processed['lon'] <= 180) &
-        (df_processed['alt'] > 0)  # Only positive altitudes (airborne)
+        (df_processed['alt'] > 0)  # Filter out sea-level and below-ground readings
     ]
     logger.info(f"Filtered out {before_filter - len(df_processed)} rows with invalid values")
     
@@ -200,7 +202,7 @@ def parse_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("Sorting data by flight_id and timestamp...")
     df_processed = df_processed.sort_values(['flight_id', 'timestamp'])
     
-    # Remove duplicates
+    # Remove duplicates (keep last to preserve most recent measurement for same timestamp)
     logger.info("Removing duplicate records...")
     before_dedup = len(df_processed)
     df_processed = df_processed.drop_duplicates(subset=['flight_id', 'timestamp'], keep='last')
