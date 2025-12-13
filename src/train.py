@@ -142,6 +142,16 @@ def main():
             # Save training stats for inference
             if train_stats is not None:
                 np.savez(os.path.join(save_dir, "norm_stats.npz"), **train_stats)
+            # Save model configuration
+            import json
+            model_config = {
+                'hidden_size': args.hidden,
+                'num_layers': args.layers,
+                'dropout': args.dropout,
+                'use_layer_norm': args.use_layer_norm
+            }
+            with open(os.path.join(save_dir, "config.json"), 'w') as f:
+                json.dump(model_config, f, indent=2)
             with open(os.path.join(save_dir, "meta.txt"), "w") as f:
                 f.write(f"epoch={epoch}\nval_ADE={val_ade}\nval_FDE={val_fde}\n")
                 f.write(f"hidden_size={args.hidden}\nnum_layers={args.layers}\n")
