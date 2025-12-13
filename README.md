@@ -23,6 +23,31 @@
    - If CUDA OOM errors occur, reduce the batch size in the training settings.
    - For missing dependencies, manually install them or update the `requirements.txt`.
 
+### OpenSky Historical Data Ingestion
+The repository now includes `opensky_historical_ingestion.py` for processing historical OpenSky flight data:
+
+1. **Download OpenSky Data**:
+   - Visit https://opensky-network.org/datasets/states/
+   - Download historical state vectors in parquet format
+
+2. **Process Historical Data**:
+   ```bash
+   python opensky_historical_ingestion.py --input /path/to/opensky_data.parquet --output data/processed/flights.csv
+   ```
+   
+   The script will:
+   - Load and parse the parquet file
+   - Handle various column name variations
+   - Drop rows with missing essential values
+   - Convert timestamps to unix format
+   - Filter invalid coordinates and altitudes
+   - Save to CSV format compatible with `prepare_sequences.py`
+
+3. **Prepare Sequences for Training**:
+   ```bash
+   python src/prepare_sequences.py --input_csv data/processed/flights.csv --output_npz data/sequences.npz
+   ```
+
 ### Recent Updates
 The repository now includes:
 - `Pull Request #1`: Optimizations for LSTM architecture, hyperparameters, and regularization.
